@@ -11,11 +11,20 @@ const SECRET = 'the_secret_key';
 // Middlewares
 app.use(bodyParser.json());
 app.use(cors());
+require('dotenv').config();
+
 
 // Database Connection
-const sequelize = new Sequelize('postgres://postgres:root@localhost:5432/train_booking', {
+const sequelize = new Sequelize(process.env.DATABASE_URL, {
   dialect: 'postgres',
+  dialectOptions: {
+    ssl: {
+      require: true,
+      rejectUnauthorized: false, // Important for cloud-hosted databases
+    },
+  },
 });
+
 
 // Define Models
 const User = sequelize.define('User', {
@@ -63,7 +72,7 @@ const populateSeats = async () => {
     }
   };
 
-
+// populateSeats();
 // Sync Models
 sequelize.sync({ force: false }).then(() => console.log('Database synced'));
 
